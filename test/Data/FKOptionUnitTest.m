@@ -1,8 +1,8 @@
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "FK/FKOption.h"
 #import "FK/FKMacros.h"
 
-@interface FKOptionUnitTest : SenTestCase {
+@interface FKOptionUnitTest : XCTestCase {
     NSObject *object;
 }
 @end
@@ -14,61 +14,61 @@
 }
 
 - (void)testANoneIsNone {
-    STAssertTrue([[FKOption none] isNone], nil);
-    STAssertFalse([[FKOption none] isSome], nil);
+    XCTAssertTrue([[FKOption none] isNone]);
+    XCTAssertFalse([[FKOption none] isSome]);
 }
 
 - (void)testASomeIsSome {
-    STAssertTrue([[FKOption some:object] isSome], nil);
-    STAssertFalse([[FKOption some:object] isNone], nil);
+    XCTAssertTrue([[FKOption some:object] isSome]);
+    XCTAssertFalse([[FKOption some:object] isNone]);
 }
 
 - (void)testCanPullTheSomeValueOutOfASome {
-    STAssertEqualObjects(object, [[FKOption some:object] some], nil);
+    XCTAssertEqualObjects(object, [[FKOption some:object] some]);
 }
 
 - (void)testTransformsNilsIntoNones {
-    STAssertTrue([[FKOption fromNil:nil] isNone], nil);
-    STAssertTrue([[FKOption fromNil:object] isSome], nil);
+    XCTAssertTrue([[FKOption fromNil:nil] isNone]);
+    XCTAssertTrue([[FKOption fromNil:object] isSome]);
 }
 
 - (void)testMaps {
-	STAssertTrue([[[FKOption none] map:^(id v) { return [v description]; }] isNone], nil);
+	XCTAssertTrue([[[FKOption none] map:^(id v) { return [v description]; }] isNone]);
 	NSString *description = [object description];
 	FKOption *r = [[FKOption some:object] map:^(id v) { return [v description]; }];
-	STAssertTrue([r isSome], nil);	
-	STAssertEqualObjects([r some], description, nil);
+	XCTAssertTrue([r isSome]);	
+	XCTAssertEqualObjects([r some], description);
 }
 
 - (void)testTypes {
-	STAssertTrue([[FKOption fromNil:@"54" ofType:[NSString class]] isSome], nil);
-	STAssertTrue([[FKOption fromNil:nil ofType:[NSString class]] isNone], nil);
-	STAssertTrue([[FKOption fromNil:@"54" ofType:[NSArray class]] isNone], nil);
+	XCTAssertTrue([[FKOption fromNil:@"54" ofType:[NSString class]] isSome]);
+	XCTAssertTrue([[FKOption fromNil:nil ofType:[NSString class]] isNone]);
+	XCTAssertTrue([[FKOption fromNil:@"54" ofType:[NSArray class]] isNone]);
 }
 
 - (void)testBindingAcrossANoneGivesANone {
     id result = [[FKOption none] bind:^(id v) { return [FKOption none]; }];
-    STAssertTrue([result isKindOfClass:[FKOption class]], nil);
-    STAssertTrue([result isNone], nil);
+    XCTAssertTrue([result isKindOfClass:[FKOption class]]);
+    XCTAssertTrue([result isNone]);
 }
 
 - (void)testBindingAcrossASomeWithANoneGivesANone {
     id result = [[FKOption some:@"foo"] bind:^(id v) { return [FKOption none]; }];
-    STAssertTrue([result isKindOfClass:[FKOption class]], nil);
-    STAssertTrue([result isNone], nil);
+    XCTAssertTrue([result isKindOfClass:[FKOption class]]);
+    XCTAssertTrue([result isNone]);
 }
 
 - (void)testBindingAcrossASomeWithASomeGivesANone {
     id result = [[FKOption some:@"foo"] bind:^(id v) { return [FKOption some:v]; }];
-    STAssertTrue([result isKindOfClass:[FKOption class]], nil);
-    STAssertTrue([result isSome], nil);
-    STAssertEqualObjects(@"foo", [result some], nil);
+    XCTAssertTrue([result isKindOfClass:[FKOption class]]);
+    XCTAssertTrue([result isSome]);
+    XCTAssertEqualObjects(@"foo", [result some]);
 }
 
 - (void)testSomes {
 	NSArray *options = @[[FKOption some:@"54"], [FKOption none]];
 	NSArray *somes = [FKOption somes:options];
-	STAssertEqualObjects(@[@"54" ], somes, nil);
+	XCTAssertEqualObjects(@[@"54" ], somes);
 }
 
 - (BOOL)isString:(id)arg {
@@ -78,8 +78,8 @@
 - (void)testFilter {
     FKOption *o1 = [FKOption some:[NSNumber numberWithInt:5]];
     FKOption *o2 = [FKOption some:@"Okay"];
-    STAssertTrue([[[FKOption none] filter:^(id v){return [self isString:v];}] isNone], nil);
-    STAssertTrue([[o1 filter:^(id v){return [self isString:v];}] isNone], nil);
-    STAssertTrue([[o2 filter:^(id v){return [self isString:v];}] isSome], nil);
+    XCTAssertTrue([[[FKOption none] filter:^(id v){return [self isString:v];}] isNone]);
+    XCTAssertTrue([[o1 filter:^(id v){return [self isString:v];}] isNone]);
+    XCTAssertTrue([[o2 filter:^(id v){return [self isString:v];}] isSome]);
 }
 @end
